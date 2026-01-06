@@ -1,8 +1,44 @@
+from http import HTTPStatus
+from typing import Any, Optional
+
 class LearnPathException(Exception):
-    pass
+    code: str = "GENERAL_ERROR"
+    message: str = "An unexpected "
+    status_code: int = HTTPStatus.INTERNAL_SERVER_ERROR.value
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        code: Optional[str] = None,
+        status_code: Optional[str] = None,
+        **kwargs: Any,
+    ):
+        self.message = message or self.message
+        self.code = code or self.code
+        self.status_code = status_code or self.status_code
+        self.extra = kwargs
+        
+        super().__init__(self.message)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "error": {
+                "code": self.code,
+                "message": self.message,
+                "status_code": self.status_code,
+                **self.extra,
+            }
+        }
+    
+    def __str__(self) -> str:
+        return f"{self.code} ({self.status_code}): {self.message}"
 
 class LLMServiceError(LearnPathException):
-    pass
+    code = "LLM_SERVICE_ERROR"
+    message = "Failed to communicate with the LLM service"
+    status_code = HTTPStatus.BAD_REQUEST.value
 
 class ValidationError(LearnPathException):
-    pass
+    code = "VALIDATION_ERROR"
+    message = "Invalid input data provider"
+    status_code = HTTPStatus.BAD_REQUEST.value

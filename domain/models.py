@@ -39,3 +39,11 @@ class UserProfile(BaseModel):
     goal: str = Field(..., description="User's learning goal")
     current_level: str = Field(..., description="User's current skill level (e.g., 'beginner', 'intermediate', 'advanced')")
     time_commitment:str = Field(..., description="Daily time user can commit to learning (e.g., 30 minutes, 2 hours)")
+
+class ChatMessage(BaseModel):
+    role: str = Field(..., description="Message role: 'user' or 'assistant'")
+    content: str = Field(..., description="Message content")
+    timestamp: datetime = Field(
+        default_factory=datetime.now,
+        description="Timestamp when the message was created"
+    )

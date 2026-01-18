@@ -5,9 +5,9 @@ import google.generativeai as genai
 from utils.logger import logger
 from utils.exceptions import LLMServiceError, ValidationError
 from utils.retry import gemini_retry
-from domain.interfaces import LLMClient
+from ai.llm_client import LLMClient
 
-class GeminiClient(LLMClient):
+class GeminiClient:
     """
     Gemini implementation of LLMClient
     """
@@ -49,7 +49,7 @@ class GeminiClient(LLMClient):
         Initialize Gemini SDK model
 
         Returns:
-            GenerativeModel: intialized Gemini model
+            GenerativeModel: initialized Gemini model
 
         Raises:
             ValidationError: On invalid API key or model name

@@ -3,7 +3,7 @@ from typing import Any, Optional
 
 class LearnPathException(Exception):
     code: str = "GENERAL_ERROR"
-    message: str = "An unexpected "
+    message: str = "An unexpected error occurred"
     status_code: int = HTTPStatus.INTERNAL_SERVER_ERROR.value
 
     def __init__(
@@ -40,5 +40,5 @@ class LLMServiceError(LearnPathException):
 
 class ValidationError(LearnPathException):
     code = "VALIDATION_ERROR"
-    message = "Invalid input data provider"
+    message = "Invalid input data provided"
     status_code = HTTPStatus.BAD_REQUEST.value

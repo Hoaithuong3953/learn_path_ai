@@ -2,7 +2,7 @@ from typing import Protocol, List, Dict, Generator
 
 class LLMClient(Protocol):
     """
-    Interfacr for LLM Clients (Gemini, OpenAI,...)
+    Interface for LLM Clients (Gemini, OpenAI,...)
     """
 
     def generate_text(self, prompt: str) -> str:

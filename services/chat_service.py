@@ -4,7 +4,6 @@ from utils.logger import logger
 from utils.exceptions import LLMServiceError
 from ai.llm_client import GeminiClient
 from memory.chat_memory import ChatMemory
-from config.constant import CHAT_ERROR_MESSAGES
 
 class ChatService:
     """

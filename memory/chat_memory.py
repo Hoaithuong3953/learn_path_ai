@@ -1,37 +1,44 @@
-import streamlit as st
-from typing import List, Dict
+from typing import List
+from datetime import datetime
+
+from domain.models import ChatMessage
+from memory.chat_history import ChatHistory
 
 class ChatMemory:
     """
-    Manages chat history
     Responsibilities:
     - Store chat history in memory
     - Provide methods to add and retrieve messages
     """
-    def __init__(self, storage: List[Dict[str, str]]):
+    def __init__(self, storage: List[ChatMessage]):
         """Initialize chat memory with storage"""
         self.storage = storage
 
-    def load_history(self) -> List[Dict[str, str]]:
+    def load_history(self) -> List[ChatMessage]:
         """Load chat history from storage"""
         return self.storage
 
-    def _add_message(self, role: str, content: str) -> Dict[str, str]:
+    def add_message(self, message: ChatMessage) -> None:
         """Format and append a message to the chat history"""
-        msg = {
-            "role": role,
-            "content": content
-        }
-        self.storage.append(msg)
-        return msg
+        self.storage.append(message)
     
-    def add_user_message(self, content: str):
+    def add_user_message(self, content: str) -> None:
         """Add a user message to the chat history"""
-        self._add_message("user", content)
+        message = ChatMessage(
+            role="user",
+            content=content,
+            timestamp=datetime.now()
+        )
+        self.add_message(message)
     
-    def add_bot_message(self, content: str):
+    def add_bot_message(self, content: str) -> None:
         """Add a bot message to the chat history"""
-        self._add_message("assistant", content)
+        message = ChatMessage(
+            role="assistant",
+            content=content,
+            timestamp=datetime.now()
+        )
+        self.add_message(message)
 
     def clean_history(self):
         """Clear the chat history"""

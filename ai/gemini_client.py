@@ -11,7 +11,7 @@ class GeminiClient:
     """
     Gemini implementation of LLMClient
     """
-    def __init__(self, api_key: str, model_name: str, request_timeout: int):
+    def __init__(self, api_key: str, model_name: str, request_timeout: int, stream_timeout: int):
         """
         Initialize GeminiClient
 
@@ -28,6 +28,7 @@ class GeminiClient:
         self.api_key = api_key
         self.model_name = model_name
         self.request_timeout = request_timeout
+        self.stream_timeout = stream_timeout
 
         self.model = self._init_model()
         
@@ -85,7 +86,7 @@ class GeminiClient:
             LLMServiceError: On transient errors (timeout, 5xx) after retries
         """
         if not prompt or not prompt.strip():
-            return ValidationError(message="Prompt must not be empty")
+            raise ValidationError(message="Prompt must not be empty")
         
         try:
             response = self.model.generate_content(prompt, request_options={"timeout": self.request_timeout})
@@ -99,7 +100,7 @@ class GeminiClient:
             raise LLMServiceError(
                 code="EMPTY_RESPONSE", 
                 message="Gemini returned empty response"
-            ) from e
+            )
         
         return response.text.strip()
         
@@ -119,7 +120,7 @@ class GeminiClient:
             LLMServiceError: On Gemini streaming failure
         """
         if not new_message or not new_message.strip():
-            return ValidationError(message="New message must be not empty")
+            raise ValidationError(message="New message must be not empty")
         
         try:
             chat = self.model.start_chat(history=history)

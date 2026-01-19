@@ -76,3 +76,31 @@ class TestLearnPathException:
         assert "TEST_ERROR" in str_repr
         assert "400" in str_repr
         assert "Test error" in str_repr
+
+class TestLLMServiceError:
+    """
+    Test LLMServiceError exception
+    """
+
+    def test_default_values(self):
+        """Test LLMServiceError with default values"""
+        exc = LLMServiceError()
+
+        assert exc.code == "LLM_SERVICE_ERROR"
+        assert exc.message == "Failed to communicate with the LLM service"
+        assert exc.status_code == HTTPStatus.BAD_REQUEST.value
+
+    def test_custom_messages(self):
+        """Test LLMServiceError with custom message"""
+        exc = LLMServiceError(message="API timeout after 30s")
+
+        assert exc.code == "LLM_SERVICE_ERROR"
+        assert exc.message == "API timeout after 30s"
+        assert exc.status_code == HTTPStatus.BAD_REQUEST.value
+
+    def test_inheritance(self):
+        """Test that LLMServiceError inherits from LearnPathException"""
+        exc = LLMServiceError()
+
+        assert isinstance(exc, LearnPathException)
+        assert isinstance(exc, Exception)

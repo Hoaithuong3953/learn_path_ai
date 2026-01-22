@@ -249,3 +249,40 @@ class TestSettingsInstanceCreation:
             assert isinstance(settings.LOG_TO_FILE, bool)
             assert isinstance(settings.LOG_FILE_PATH, str)
             assert isinstance(settings.LOG_FILE_RETENTION, int)
+
+class TestSettingsIntegration:
+    """Test settings integration with other components"""
+
+    def test_settings_can_be_imported(self):
+        """Test that settings can be import from config module"""
+        from config.settings import settings
+
+        assert settings is not None
+        assert isinstance(settings, Settings)
+
+    def test_settings_used_in_gemini_client(self):
+        """Test that settings can be used to initialize GeminiClient"""
+        env_vars = {
+            "GEMINI_API_KEY": VALID_GEMINI_API_KEY
+        }
+
+        with patch.dict(os.environ, env_vars):
+            settings = Settings(_env_file=None)
+
+            assert hasattr(settings, "GEMINI_API_KEY")
+            assert hasattr(settings, "GEMINI_MODEL")
+
+    def test_settings_load_from_env_file(self):
+        """Test that settings can be loaded from .env file"""
+        env_vars = {
+            "GEMINI_API_KEY": VALID_GEMINI_API_KEY,
+            "GEMINI_MODEL": "gemini-2.5-pro",
+            "LOG_LEVEL": "DEBUG"
+        }
+
+        with patch.dict(os.environ, env_vars):
+            settings = Settings(_env_file=None)
+
+            assert settings.GEMINI_API_KEY == VALID_GEMINI_API_KEY
+            assert settings.GEMINI_MODEL == "gemini-2.5-pro"
+            assert settings.LOG_LEVEL == "DEBUG"

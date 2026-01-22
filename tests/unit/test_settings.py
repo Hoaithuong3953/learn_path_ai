@@ -213,3 +213,39 @@ class TestSettingsFieldValidation:
                     error["loc"] == ("LOG_FILE_RETENTION",)
                     for error in errors
                 )
+
+class TestSettingsInstanceCreation:
+    """Test settings instance creation and access"""
+    def test_settings_instance_creation(self):
+        """Test that settings instance can be created"""
+        env_vars = {
+            "GEMINI_API_KEY": VALID_GEMINI_API_KEY
+        }
+
+        with patch.dict(os.environ, env_vars):
+            settings = Settings(_env_file=None)
+
+            assert isinstance(settings, Settings)
+
+            assert hasattr(settings, "GEMINI_API_KEY")
+            assert hasattr(settings, "GEMINI_MODEL")
+            assert hasattr(settings, "LOG_LEVEL")
+            assert hasattr(settings, "LOG_TO_FILE")
+            assert hasattr(settings, "LOG_FILE_PATH")
+            assert hasattr(settings, "LOG_FILE_RETENTION")
+
+    def test_settings_field_types(self):
+        """Test that settings fiedls have correct types"""
+        env_vars = {
+            "GEMINI_API_KEY": VALID_GEMINI_API_KEY
+        }
+
+        with patch.dict(os.environ, env_vars):
+            settings = Settings(_env_file=None)
+
+            assert isinstance(settings.GEMINI_API_KEY, str)
+            assert isinstance(settings.GEMINI_MODEL, str)
+            assert isinstance(settings.LOG_LEVEL, str)
+            assert isinstance(settings.LOG_TO_FILE, bool)
+            assert isinstance(settings.LOG_FILE_PATH, str)
+            assert isinstance(settings.LOG_FILE_RETENTION, int)

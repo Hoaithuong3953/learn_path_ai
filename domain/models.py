@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Literal
 from datetime import datetime
 
 class Resource(BaseModel):
@@ -8,7 +8,10 @@ class Resource(BaseModel):
     """
     title: str = Field(..., description="Title of the resource")
     url: str = Field(..., description="Direct link to the resource")
-    type: str = Field(..., description="Type of resource (e.g., 'video', 'article', 'book', 'course', 'documentation')")
+    type: Literal["video", "article", "book", "cource", "practice", "project", "documentation"] = Field(
+        ..., 
+        description="Type of resource"
+    )
 
 class Milestone(BaseModel):
     """
@@ -41,7 +44,10 @@ class UserProfile(BaseModel):
     time_commitment:str = Field(..., description="Daily time user can commit to learning (e.g., 30 minutes, 2 hours)")
 
 class ChatMessage(BaseModel):
-    role: str = Field(..., description="Message role: 'user' or 'assistant'")
+    role: Literal["user", "assistant"] = Field(
+        ..., 
+        description="Message role: 'user' or 'assistant'"
+    )
     content: str = Field(..., description="Message content")
     timestamp: datetime = Field(
         default_factory=datetime.now,

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, model_validator, ValidationInfo
 from typing import List, Literal, Optional
 from datetime import datetime
 
@@ -6,7 +6,7 @@ class Resource(BaseModel):
     """
     Represents a single learning resource included in a milestone
     """
-    title: str = Field(..., description="Title of the resource")
+    title: str = Field(..., max_length=200, description="Title of the resource")
     url: str = Field(..., description="Direct link to the resource")
     type: Literal["video", "article", "book", "cource", "practice", "project", "documentation"] = Field(
         ..., 
@@ -24,8 +24,8 @@ class Milestone(BaseModel):
     Each milestone covers a specific topic with description and recommended resources
     """
     week: int = Field(..., ge=1, description="Week number in the roadmap (starting from 1)")
-    topic: str = Field(..., description="Main topic covered in this week")
-    description: str = Field(..., description="Detailed description of what will be learned in this week")
+    topic: str = Field(..., max_length=200, description="Main topic covered in this week")
+    description: str = Field(...,max_length=1000, description="Detailed description of what will be learned in this week")
     resources: List[Resource] = Field(
         default_factory=list,
         description="List of recommended resources for this milestone"
@@ -37,19 +37,45 @@ class Roadmap(BaseModel):
     """
     Complete personalize learning roadmap generated for a user
     """
-    topic: str = Field(..., description="Overall main topic of the learning path")
-    title: Optional[str] = Field(None, description="Display title (auto-set to topic if not provided)")
-    desciption: Optional[str] = Field(None, description="Overall description of roadmap content and goals")
+    topic: str = Field(..., max_length=200, description="Overall main topic of the learning path")
+    title: Optional[str] = Field(None, max_length=200, description="Display title (auto-set to topic if not provided)")
+    desciption: Optional[str] = Field(None, max_length=1000, description="Overall description of roadmap content and goals")
     duration_week: int = Field(..., ge=1, description="Total duration of the roadmap in weeks")
     milestones: List[Milestone] = Field(..., min_length=1, description="List of weekly milestones")
     prerequisites: Optional[List[str]] = Field(None, description="Prerequisites required before starting")
     created_at: datetime = Field(default_factory=datetime.now, description="Timestamp when the roadmap was generated")
 
+    @field_validator('milistones')
+    @classmethod
+    def validate_milestones(cls, v: List[Milestone], info: ValidationInfo) -> List[Milestone]:
+        """
+        Validate:
+        - Week numbers are sequential starting from 1
+        - Number of milestones matches duration_week
+        """
+        # Sequential weeks
+        weeks = [m.week for m in v]
+        expected = list(range(1, len(weeks) + 1))
+        if weeks != expected:
+            raise ValueError(
+                f"Week numbers must be sequential starting from 1. "
+                f"Got {weeks}, expected {expected}"
+            )
+        
+        # Milestone count matches duration_week
+        if 'duration_week' in info.data:
+            duration_week = info.data['duration_week']
+            if len(v) != duration_week:
+                raise ValueError(f"Number of milestones ({len(v)}) must match duration_week ({duration_week})")
+            
+        return v
+    
+
 class UserProfile(BaseModel):
     """
     User input profile used to generate a personalized roadmap
     """
-    goal: str = Field(..., description="User's learning goal")
+    goal: str = Field(..., max_length=500, description="User's learning goal")
     current_level: str = Field(..., description="User's current skill level (e.g., 'beginner', 'intermediate', 'advanced')")
     time_commitment:str = Field(..., description="Daily time user can commit to learning (e.g., 30 minutes, 2 hours)")
     learning_style: Optional[str] = Field(None, description="Learning style preference")

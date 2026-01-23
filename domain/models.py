@@ -38,8 +38,11 @@ class Roadmap(BaseModel):
     Complete personalize learning roadmap generated for a user
     """
     topic: str = Field(..., description="Overall main topic of the learning path")
+    title: Optional[str] = Field(None, description="Display title (auto-set to topic if not provided)")
+    desciption: Optional[str] = Field(None, description="Overall description of roadmap content and goals")
     duration_week: int = Field(..., ge=1, description="Total duration of the roadmap in weeks")
     milestones: List[Milestone] = Field(..., min_length=1, description="List of weekly milestones")
+    prerequisites: Optional[List[str]] = Field(None, description="Prerequisites required before starting")
     created_at: datetime = Field(default_factory=datetime.now, description="Timestamp when the roadmap was generated")
 
 class UserProfile(BaseModel):

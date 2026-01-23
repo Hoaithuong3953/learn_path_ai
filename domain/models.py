@@ -45,6 +45,13 @@ class Roadmap(BaseModel):
     prerequisites: Optional[List[str]] = Field(None, description="Prerequisites required before starting")
     created_at: datetime = Field(default_factory=datetime.now, description="Timestamp when the roadmap was generated")
 
+    @model_validator(mode="after")
+    def set_default_title(self):
+        """Auto-set title = topic if title is not provided"""
+        if not self.title:
+            self.title = self.topic
+        return self
+
     @field_validator('milistones')
     @classmethod
     def validate_milestones(cls, v: List[Milestone], info: ValidationInfo) -> List[Milestone]:

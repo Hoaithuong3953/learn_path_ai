@@ -52,6 +52,9 @@ class UserProfile(BaseModel):
     goal: str = Field(..., description="User's learning goal")
     current_level: str = Field(..., description="User's current skill level (e.g., 'beginner', 'intermediate', 'advanced')")
     time_commitment:str = Field(..., description="Daily time user can commit to learning (e.g., 30 minutes, 2 hours)")
+    learning_style: Optional[str] = Field(None, description="Learning style preference")
+    background: Optional[str] = Field(None, description="Personal background/context")
+    constraints: Optional[List[str]] = Field(None, description="User constraints (e.g., ['Free only', 'Weekends only'])")
 
 class ChatMessage(BaseModel):
     role: Literal["system", "user", "assistant"] = Field(

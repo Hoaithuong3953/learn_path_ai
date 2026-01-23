@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator, model_validator, ValidationInfo
+from pydantic import BaseModel, Field, field_validator, model_validator, ValidationInfo, HttpUrl
 from typing import List, Literal, Optional
 from datetime import datetime
 
@@ -7,7 +7,7 @@ class Resource(BaseModel):
     Represents a single learning resource included in a milestone
     """
     title: str = Field(..., max_length=200, description="Title of the resource")
-    url: str = Field(..., description="Direct link to the resource")
+    url: HttpUrl = Field(..., description="Direct link to the resource")
     type: Literal["video", "article", "book", "cource", "practice", "project", "documentation"] = Field(
         ..., 
         description="Type of resource"

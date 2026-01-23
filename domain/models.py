@@ -27,7 +27,8 @@ class Milestone(BaseModel):
     topic: str = Field(..., max_length=200, description="Main topic covered in this week")
     description: str = Field(...,max_length=1000, description="Detailed description of what will be learned in this week")
     resources: List[Resource] = Field(
-        default_factory=list,
+        ...,
+        max_length=1,
         description="List of recommended resources for this milestone"
     )
     estimated_time: Optional[str] = Field(None, description="Estimated time for this week (e.g., '5 giờ')")

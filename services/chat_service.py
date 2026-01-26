@@ -2,17 +2,18 @@ from typing import Generator
 
 from utils.logger import logger
 from utils.exceptions import LLMServiceError
-from ai.llm_client import GeminiClient
-from memory.chat_memory import ChatMemory
+from ai.llm_client import LLMClient
+from memory.chat_history import ChatHistory
+from domain.models import ChatMessage
 
 class ChatService:
     """
     Service Layer for Chat Operations.
     Responsibility: Isolate the UI from the complexity of managing AI state and API calls.
     """
-    def __init__(self, ai_client: GeminiClient, memory: ChatMemory):
+    def __init__(self, ai_client: LLMClient, history: ChatHistory):
         self.ai = ai_client
-        self.memory = memory
+        self.history = history
 
     def process_message(self, user_input: str) -> Generator[str, None, None]:
         """
@@ -23,7 +24,8 @@ class ChatService:
             yield "Vui lòng nhập nội dung tin nhắn."
             return
 
-        self.memory.add_user_message(user_input)
+        user_message = ChatMessage(role="user", content=user_input)
+        self.history.add_message(user_message)
 
         yield from self._stream_response(user_input)
 
@@ -42,7 +44,7 @@ class ChatService:
         """
         Handles the LLM streaming lifecycle.
         """
-        raw_history = self.memory.load_history()
+        raw_history = self.history.load_history()
         history_context = raw_history[:-1]
 
         logger.info(f"Processing chat. Context length: {len(history_context)}")
@@ -74,5 +76,6 @@ class ChatService:
 
         finally:
             if full_response:
-                self.memory.add_bot_message(full_response)
+                bot_message = ChatMessage(role="assistant", content=full_response)
+                self.history.add_message(bot_message)
                 logger.info(f"Saved bot response (Length: {len(full_response)}), Error: {error_occurred}")

@@ -1,4 +1,4 @@
-from typing import Generator
+from typing import Generator, List
 
 from utils.logger import logger
 from utils.exceptions import LLMServiceError
@@ -78,8 +78,12 @@ class ChatService:
         Yields:
             str: Chunks of the AI-generated response as they arrive
         """
-        raw_history = self.history.load_history()
-        history_context = raw_history[:-1]
+        raw_history: List[ChatMessage] = self.history.load_history()
+        if len(raw_history) > 1:
+            history_context = raw_history[:-1]
+        else:
+            history_context = []
+            logger.info("No previous history, starting fresh conversation")
 
         logger.info(f"Processing chat. Context length: {len(history_context)}")
 

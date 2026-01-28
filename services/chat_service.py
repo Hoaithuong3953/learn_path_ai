@@ -113,7 +113,9 @@ class ChatService:
             error_occurred = True
 
         finally:
-            if full_response:
+            if full_response and not error_occurred:
                 bot_message = ChatMessage(role="assistant", content=full_response)
                 self.history.add_message(bot_message)
                 logger.info(f"Saved bot response (Length: {len(full_response)}), Error: {error_occurred}")
+            elif error_occurred:
+                logger.warning("Error occurred, not saving to history")

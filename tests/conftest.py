@@ -2,12 +2,8 @@
 Pytest fixtures for LearnPath chatbot tests
 """
 import pytest
-from unittest.mock import Mock, MagicMock
-from typing import Generator, List, Dict, Any
 
-from domain.models import ChatMessage, UserProfile, Roadmap, Milestone, Resource
-from ai.llm_client import LLMClient
-from memory.chat_memory import ChatMemory
+from domain import ChatMessage, UserProfile, Roadmap, Milestone, Resource
 
 @pytest.fixture
 def sample_chat_message() -> ChatMessage:

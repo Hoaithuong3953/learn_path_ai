@@ -1,11 +1,18 @@
-from typing import List
-from datetime import datetime
+"""
+In-memory implementation of chat history storage
 
-from domain.models import ChatMessage
-from memory.chat_history import ChatHistory
+This module provides a simple list-based storage
+suitable for testing, prototypes and short-lived sessions
+
+Data is lost on program restart
+"""
+
+from typing import List
+from domain import ChatMessage
 
 class ChatMemory:
     """
+    Manages chat history
     Responsibilities:
     - Store chat history in memory
     - Provide methods to add and retrieve messages
@@ -19,26 +26,18 @@ class ChatMemory:
         return self.storage
 
     def add_message(self, message: ChatMessage) -> None:
-        """Format and append a message to the chat history"""
+        """Add a message to the chat history"""
         self.storage.append(message)
     
-    def add_user_message(self, content: str) -> None:
+    def add_user_message(self, content: str):
         """Add a user message to the chat history"""
-        message = ChatMessage(
-            role="user",
-            content=content,
-            timestamp=datetime.now()
-        )
-        self.add_message(message)
+        msg = ChatMessage(role="user", content=content)
+        self.add_message(msg)
     
-    def add_bot_message(self, content: str) -> None:
+    def add_bot_message(self, content: str):
         """Add a bot message to the chat history"""
-        message = ChatMessage(
-            role="assistant",
-            content=content,
-            timestamp=datetime.now()
-        )
-        self.add_message(message)
+        msg = ChatMessage(role="assistant", content=content)
+        self.add_message(msg)
 
     def clean_history(self):
         """Clear the chat history"""

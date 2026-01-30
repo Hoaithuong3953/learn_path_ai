@@ -23,3 +23,7 @@ class ChatHistory(Protocol):
         Retrieve full chat history
         """
         ...
+
+    def clean_history(self):
+        """Clean chat history"""
+        ...

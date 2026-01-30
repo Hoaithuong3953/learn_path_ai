@@ -1,6 +1,12 @@
+"""
+Protocol defining the chat history storage interface
+
+Any class implementing these two methods can be use as chat history backend
+"""
+
 from typing import Protocol, List
 
-from domain.models import ChatMessage
+from domain import ChatMessage
 
 class ChatHistory(Protocol):
     """
@@ -14,6 +20,6 @@ class ChatHistory(Protocol):
 
     def load_history(self) -> List[ChatMessage]:
         """
-        Load full chat history
+        Retrieve full chat history
         """
         ...

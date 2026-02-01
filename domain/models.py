@@ -7,12 +7,14 @@ Key features:
 - Resource, Milestone, Roadmap: learning path structure and validation
 - UserProfile: learner input for roadmap generation
 - ChatMessage: standardized message format for AI-user conversation
+- Intent: user intent classification for routing chat and roadmap flow
 - Pydantic validation for domain invariants (sequential weeks, duration_week match, etc.)
 """
 
 from pydantic import BaseModel, Field, field_validator, model_validator, ValidationInfo, HttpUrl
 from typing import List, Literal, Optional
 from datetime import datetime
+from enum import Enum
 
 class Resource(BaseModel):
     """
@@ -98,7 +100,7 @@ class UserProfile(BaseModel):
     time_commitment: str = Field(..., description="Daily time user can commit to learning (e.g., 30 minutes, 2 hours)")
     learning_style: Optional[str] = Field(None, description="Learning style preference")
     background: Optional[str] = Field(None, description="Personal background/context")
-    constraints: Optional[List[str]] = Field(None, description="User constraints (e.g., ['Free only', 'Weekends only'])")
+    constraints: Optional[List[str]] = Field(None, description="Điều kiện/hạn chế của người học (vd: ['Chỉ tài liệu miễn phí', 'Chỉ cuối tuần'])")
 
 class ChatMessage(BaseModel):
     """
@@ -113,3 +115,10 @@ class ChatMessage(BaseModel):
         default_factory=datetime.now,
         description="Timestamp when the message was created"
     )
+
+class Intent(Enum):
+    """
+    User intent classification for routing chat and roadmap flow
+    """
+    CHAT = "chat"
+    ROADMAP = "roadmap"

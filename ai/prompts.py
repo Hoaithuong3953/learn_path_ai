@@ -1,5 +1,11 @@
 """
-Prompt templates and system instructions used by the LearnPath Gemini-based assistant.
+prompts.py
+
+Prompt templates and system instructions for the LearnPath Gemini-based assistant
+
+Key features:
+- SYSTEM_PROMPT: system instruction for chat behavior (Vietnamese, education-focused)
+- ROADMAP_PROMPT_TEMPLATE: template for generating roadmap JSON from user profile
 """
 
 from string import Template

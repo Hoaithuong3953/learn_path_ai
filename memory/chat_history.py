@@ -1,8 +1,11 @@
 """
+chat_history.py
+
 Protocol defining the required interface for any chat history storage
 
-Any class that implements these methods can be used as a valid chat history backend
-This enables loose coupling and easy swapping between implementations (in-memory, Redis, database,...)
+Key features:
+- add_message, load_history, clean_history: contract for chat history backends
+- Enables swapping implementations (in-memory, Redis, database)
 """
 
 from typing import Protocol, List
@@ -12,6 +15,11 @@ from domain import ChatMessage
 class ChatHistory(Protocol):
     """
     Interface that every chat history storage must follow
+
+    Responsibilities:
+    - add_message: append a message in chronological order
+    - load_history: return messages oldest-first
+    - clean_history: remove all messages (e.g. new conversation or session reset)
     """
     def add_message(self, message: ChatMessage) -> None:
         """Append a new message to the end of the conversation history

@@ -1,10 +1,13 @@
 """
-Roadmap service for LearnPath chatbot
+roadmap_service.py
 
-Builds prompts from UserProfile, calls the LLM to generate raw JSON roadmaps,
-parses them into domain Roadmap objects and applies retry policy plus validation rules
+Roadmap service for LearnPath chatbot. Builds prompts from UserProfile, calls LLM
+for raw JSON roadmaps, parses into Roadmap domain model and applies retry/validation
+
+Key features:
+- generate_roadmap: profile → Roadmap with retry on invalid output
+- Prompt build from ROADMAP_PROMPT_TEMPLATE; parse and validate JSON
 """
-
 import json
 from typing import Optional
 
@@ -14,13 +17,12 @@ from utils import LLMServiceError, ValidationError, logger
 
 class RoadmapService:
     """
-    Service for generating and validating learning roadmaps
+    Generate and validate learning roadmaps from user profiles
 
     Responsibilities:
     - Build roadmap generation prompt from UserProfile
     - Call LLMClient.generate_text to obtain raw JSON
-    - Parse JSON into Roadmap domain model
-    - Apply retry-on-invalid-output policy
+    - Parse JSON into Roadmap domain model; apply retry on invalid output
     """
 
     def __init__(
@@ -28,6 +30,7 @@ class RoadmapService:
         llm_client: LLMClient,
         max_retries: int = 2,
     ):
+        """Initialize with LLM client and max retries for roadmap generation"""
         self.llm = llm_client
         self.max_retries = max_retries
 
@@ -78,7 +81,7 @@ class RoadmapService:
         raise ValidationError(message=message, code="ROADMAP_GENERATION_FAILED") from last_error
         
     def _build_prompt(self, profile: UserProfile, duration_week: int) -> str:
-        """Build roadmap generation prompt using ROADMAP_PROMPT_TEMPLATE"""
+        """Build roadmap generation prompt from ROADMAP_PROMPT_TEMPLATE"""
         learning_style = profile.learning_style or "Không cung cấp"
         background = profile.background or "Không cung cấp"
         constraints = ", ".join(profile.constraints or ["Không có"])
@@ -112,5 +115,5 @@ class RoadmapService:
         return roadmap
     
     def _guess_duration(self, profile: UserProfile) -> int:
-        """Simple heuristic to guess duration_week from profile"""
+        """Guess duration_week from profile (simple heuristic)"""
         return 8

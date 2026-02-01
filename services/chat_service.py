@@ -1,3 +1,14 @@
+"""
+chat_service.py
+
+Chat service layer for LearnPath chatbot. Handles user messages: validation, session,
+streaming LLM response, history persistence and error handling
+
+Key features:
+- Input validation and session expiry; context window limit
+- Streaming response and history persistence
+- User-facing error messages on LLM/session failure
+"""
 from typing import Generator, List
 
 from utils import logger, LLMServiceError
@@ -8,10 +19,12 @@ from .session_manager import SessionManager
 
 class ChatService:
     """
-    Service Layer for Chat Operations
-    Responsibility: 
-    - Isolate the UI from the complexity of managing AI state and API calls
-    - Apply business rules around input validation, context window and error handling
+    Process user chat messages and stream AI responses with session and history
+
+    Responsibilities:
+    - Isolate UI from AI state and API calls
+    - Apply business rules (input validation, context window, session expiry)
+    - Stream response and persist history; surface user-friendly errors
     """
 
     MAX_INPUT_LENGTH = 2000
@@ -22,9 +35,9 @@ class ChatService:
         Initialize ChatService with required dependencies
 
         Args:
-            ai_client: LLM Client implementation
-            history: Chat history storage
-            session: Manages the lifetime of the current chat session
+            ai_client: LLM client implementation (generate_text, stream_chat)
+            history: Chat history storage (add_message, load_history, clean_history)
+            session: Manages lifetime of the current chat session (touch_activity, is_expired, reset)
         """
         self.ai = ai_client
         self.history = history
@@ -32,13 +45,16 @@ class ChatService:
 
     def process_message(self, user_input: str) -> Generator[str, None, None]:
         """
-        Processing a user's chat message and stream the AI response
+        Process a user chat message and stream the AI response
+
+        Validates input length and session; appends message to history then streams
+        chunks from the LLM. Errors are yielded as user-facing messages
 
         Args:
-            user_input: The user's message text
+            user_input: Raw message text from the user
 
         Yields:
-            str: Chunks of the AI response as they are generated
+            Chunks of the AI response, or an error message string on failure
         """
         user_input = user_input.strip()
 

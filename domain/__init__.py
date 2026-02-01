@@ -1,8 +1,9 @@
 """
-Domain layer for learnpath_chatbot
+Domain layer for LearnPath chatbot
 
-Contains core logic and domain models
-Independent of application and infrastructure layers
+Key features:
+- Re-export Resource, Milestone, Roadmap, UserProfile, ChatMessage from models
+- Independent of application and infrastructure layers
 """
 
 from .models import (

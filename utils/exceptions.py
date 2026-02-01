@@ -1,5 +1,12 @@
 """
-Custom exception hierarchy, including base, LLM service, and validation-related errors
+exceptions.py
+
+Custom exception hierarchy for LearnPath chatbot
+
+Key features:
+- LearnPathException: base (code, message, status_code, to_dict)
+- LLMServiceError: LLM communication failure
+- ValidationError: input or configuration validation failure
 """
 
 from http import HTTPStatus
@@ -7,7 +14,7 @@ from typing import Any, Optional, Dict
 
 class LearnPathException(Exception):
     """
-    Base exception errors that carries a code, human-readable message and HTTP status code plus optional extra data
+    Base exception errors that carries a code, human-readable message, and HTTP status code plus optional extra data
     """
     code: str = "GENERAL_ERROR"
     message: str = "An unexpected error occurred"
@@ -28,6 +35,7 @@ class LearnPathException(Exception):
         super().__init__(self.message)
 
     def to_dict(self) -> Dict[str, Any]:
+        """Return error as a dict (code, message, status_code, extra)"""
         return {
             "error": {
                 "code": self.code,

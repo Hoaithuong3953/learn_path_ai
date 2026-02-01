@@ -1,5 +1,11 @@
 """
-Retry helpers for external API calls
+retry.py
+
+Retry helpers for external API calls (Gemini transient errors)
+
+Key features:
+- gemini_retry: decorator for transient Gemini errors (exponential backoff)
+- TRANSIENT_ERRORS: tuple of retryable Google API exceptions
 """
 
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type, before_sleep_log
@@ -16,10 +22,13 @@ TRANSIENT_ERRORS = (
 
 def gemini_retry(max_retries: int = 3):
     """
-    Build a tenacity retry decorator configured for transient Gemini API errors
+    Build a tenacity retry decorator for transient Gemini API errors
 
     Args:
         max_retries: Maximum number of retry attempts before failing
+
+    Returns:
+        Decorator that retries on TRANSIENT_ERRORS with exponential backoff
     """
     return retry(
         reraise=True,

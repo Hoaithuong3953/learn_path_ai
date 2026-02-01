@@ -1,7 +1,9 @@
 """
 Services layer for LearnPath chatbot business logic
 
-Provides high-level service implementations that orchestrate AI clients and memory storage
+Key features:
+- ChatService: process messages, stream response, session and history
+- SessionManager: activity timeout and reset
 """
 
 from .chat_service import ChatService

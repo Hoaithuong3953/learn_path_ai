@@ -1,11 +1,9 @@
 """
 Memory module for managing chat conversation history
 
-Provides:
-    - ChatHistory: Protocol defining the storage interface
-    - ChatMemory: Simple in-memory implementation
-
-Designed for easy dependency injection and future extension (Redis, database, etc.)
+Key features:
+- ChatHistory: protocol for storage interface (add_message, load_history, clean_history)
+- ChatMemory: in-memory implementation for DI and future extension (Redis, DB)
 """
 
 from .chat_history import ChatHistory

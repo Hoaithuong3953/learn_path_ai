@@ -1,4 +1,8 @@
+"""
+test_gemini_client.py
 
+Unit tests for GeminiClient (config validation, generate_text, stream_chat, _to_gemini_history)
+"""
 import pytest
 from unittest.mock import MagicMock
 
@@ -7,7 +11,7 @@ from domain import ChatMessage
 from utils import LLMServiceError, ValidationError
 
 def test_validate_config_rejects_empty_api_key():
-    """Constructor should raise ValidationError when api_key is empty or whitespace"""
+    """Constructor raises ValidationError when api_key is empty or whitespace"""
     with pytest.raises(ValidationError):
         GeminiClient(
             api_key="",
@@ -18,7 +22,7 @@ def test_validate_config_rejects_empty_api_key():
         )
 
 def test_validate_config_rejects_empty_model_name():
-    """Constructor should raise ValidationError when model_name is empty or whitespace"""
+    """Constructor raises ValidationError when model_name is empty or whitespace"""
     with pytest.raises(ValidationError):
         GeminiClient(
             api_key="dummy-key",
@@ -29,7 +33,7 @@ def test_validate_config_rejects_empty_model_name():
         )
 
 def test_validate_config_rejects_empty_system_prompt():
-    """Constructor should raise ValidationError when system_prompt is empty or whitespace"""
+    """Constructor raises ValidationError when system_prompt is empty or whitespace"""
     with pytest.raises(ValidationError):
         GeminiClient(
             api_key="dummy-key",
@@ -40,7 +44,7 @@ def test_validate_config_rejects_empty_system_prompt():
         )
 
 def test_init_model_configures_genai_and_uses_system_prompt(mock_genai_model):
-    """genai.configure and GenerativeModel should receive api_key, model_name and system_instruction"""
+    """genai.configure and GenerativeModel receive api_key, model_name and system_instruction"""
     model_cls, _, mock_configure = mock_genai_model
 
     client = GeminiClient(
@@ -58,7 +62,7 @@ def test_init_model_configures_genai_and_uses_system_prompt(mock_genai_model):
     assert kwargs["system_instruction"] == "dummy-prompt"
 
 def test_generate_text_success(mock_genai_model):
-    """generate_text should call model.generate_content once and return stripped response text"""
+    """generate_text calls model.generate_content once and returns stripped response text"""
     _, model_instance, _ = mock_genai_model
     mock_response = MagicMock()
     mock_response.text = "Hello World"
@@ -78,7 +82,7 @@ def test_generate_text_success(mock_genai_model):
     assert text == "Hello World"
 
 def test_generate_text_empty_prompt_raises_validation_error(mock_genai_model):
-    """generate_text should raise ValidationError when prompt is empty or whitespace"""
+    """generate_text raises ValidationError when prompt is empty or whitespace"""
     client = GeminiClient(
         api_key="dummy-key",
         model_name="dummy-model",
@@ -91,7 +95,7 @@ def test_generate_text_empty_prompt_raises_validation_error(mock_genai_model):
         client.generate_text("   ")
 
 def test_generate_text_empty_response_raises_llm_service_error(mock_genai_model):
-    """generate_text should raise LLMServiceError when response has no usable text"""
+    """generate_text raises LLMServiceError when response has no usable text"""
     _, model_instance, _ = mock_genai_model
     mock_response = MagicMock()
     mock_response.text = ""
@@ -109,7 +113,7 @@ def test_generate_text_empty_response_raises_llm_service_error(mock_genai_model)
         client.generate_text("prompt")
 
 def test_to_gemini_history_map_roles_correctly():
-    """_to_gemini_history should map ChatMessage roles to Gemini format with parts from content"""
+    """_to_gemini_history maps ChatMessage roles to Gemini format with parts from content"""
     history = [
         ChatMessage(role="user", content="user msg"),
         ChatMessage(role="assistant", content="assistant msg"),
@@ -127,7 +131,7 @@ def test_to_gemini_history_map_roles_correctly():
     assert messages[2]["parts"] == ["system msg"]
 
 def test_stream_chat_happy_path(mock_genai_model):
-    """stream_chat should call start_chat and send_message(stream=True) and yield chunk texts"""
+    """stream_chat calls start_chat and send_message(stream=True) and yields chunk texts"""
     _, model_instance, _ = mock_genai_model
 
     def fake_stream(*args, **kwargs):
@@ -154,7 +158,7 @@ def test_stream_chat_happy_path(mock_genai_model):
     fake_chat.send_message.assert_called_once()
 
 def test_stream_chat_empty_new_message_raises_validation_error(mock_genai_model):
-    """stream_chat should raise ValidationError when new_message is empty or whitespace"""
+    """stream_chat raises ValidationError when new_message is empty or whitespace"""
     client = GeminiClient(
         api_key="dummy-key",
         model_name="dummy-model",

@@ -1,7 +1,10 @@
 """
 Utility modules for LearnPath chatbot
 
-Provides shared utilities including logging, exception handling and retry mechanisms
+Key features:
+- exceptions: LearnPathException, LLMServiceError, ValidationError
+- logger: setup_logger, shared logger instance
+- retry: gemini_retry, TRANSIENT_ERRORS
 """
 
 from .exceptions import LearnPathException, LLMServiceError, ValidationError

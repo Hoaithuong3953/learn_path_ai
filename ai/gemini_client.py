@@ -1,5 +1,12 @@
 """
+gemini_client.py
+
 Gemini LLM client implementation and streaming helpers
+
+Key features:
+- Configure and validate Gemini API (api_key, model, system_prompt)
+- generate_text with retry on transient errors
+- stream_chat with history conversion to Gemini format
 """
 
 from typing import Generator, List, Dict, Any
@@ -13,6 +20,11 @@ from domain import ChatMessage
 class GeminiClient:
     """
     Gemini implementation of LLMClient
+
+    Responsibilities:
+    - Validate config (api_key, model_name, system_prompt) and init SDK model
+    - Generate text and stream chat with timeout and retry
+    - Convert domain ChatMessage history to Gemini message format
     """
     def __init__(
         self,
@@ -23,11 +35,14 @@ class GeminiClient:
         system_prompt: str
     ):
         """
-        Initialize GeminiClient
+        Initialize GeminiClient with API config and timeouts.
 
         Args:
             api_key: Gemini API key
-            model_name: Gemini model name
+            model_name: Gemini model name (e.g. gemini-2.5-flash)
+            request_timeout: Timeout in seconds for non-streaming requests
+            stream_timeout: Timeout in seconds for streaming
+            system_prompt: System instruction for the model
 
         Raises:
             ValidationError: If api_key, model_name or system_prompt is invalid
@@ -44,12 +59,7 @@ class GeminiClient:
         self.model = self._init_model()
         
     def _validate_config(self, api_key: str, model_name: str, system_prompt: str) -> None:
-        """
-        Validate config before initializing the SDK
-
-        Raises:
-            ValidationError: If configuration is invalid
-        """
+        """Validate config before initializing the SDK; raise ValidationError if invalid"""
         if not api_key or not api_key.strip():
             raise ValidationError(message="Gemini API key must not be empty")
         
@@ -130,7 +140,7 @@ class GeminiClient:
             prompt: Input text. If empty, returns empty string
 
         Returns:
-            str: Generate content. Empty string if blocked/filtered
+            Generated content; empty string if blocked/filtered
 
         Raises:
             LLMServiceError: On transient errors (timeout, 5xx) after retries

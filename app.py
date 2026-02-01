@@ -1,5 +1,12 @@
 """
+app.py
+
 Streamlit entrypoint for the LearnPath chatbot user interface
+
+Key features:
+- Build and inject ChatService (GeminiClient, ChatMemory, SessionManager)
+- Session state for chat_service and message history
+- Chat input and streaming assistant response
 """
 
 import streamlit as st
@@ -10,6 +17,12 @@ from memory import ChatMemory
 from services import ChatService, SessionManager
 
 def build_chat_service() -> ChatService:
+    """
+    Build and return ChatService with GeminiClient, ChatMemory, SessionManager
+
+    Returns:
+        ChatService configured with settings (API key, model, timeouts) and in-memory history/session
+    """
     ai_client = GeminiClient(
         api_key=settings.GEMINI_API_KEY,
         model_name=settings.GEMINI_MODEL,

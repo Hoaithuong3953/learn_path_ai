@@ -1,5 +1,11 @@
 """
+logger.py
+
 Logging configuration helpers and shared logger instance
+
+Key features:
+- setup_logger: console and optional file output from settings
+- Logger name, level, format and file rotation from config
 """
 
 import logging
@@ -11,15 +17,15 @@ from config import settings
 
 def setup_logger(name: str = "learnpath-bot") -> logging.Logger:
     """
-    Configure and return a named logger with console and optinal file output
+    Configure and return a named logger with console and optional file output
 
-    Configuration is loaded from `settings`
+    Configuration is loaded from settings (LOG_LEVEL, LOG_TO_FILE, LOG_FILE_*)
 
     Args:
-        name: Logger name defaults to 'learnpath-bot'
+        name: Logger name (default 'learnpath-bot')
 
     Returns:
-        Configured logging.Logger instance
+        Configured logger instance
     """
     logger = logging.getLogger(name)
 

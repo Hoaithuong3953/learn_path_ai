@@ -1,5 +1,12 @@
 """
-Application configuration and environment-based settings
+settings.py
+
+Application configuration and environment-based settings loaded from .env
+
+Key features:
+- GEMINI_API_KEY, GEMINI_MODEL: API and model config (required/optional)
+- LOG_LEVEL, LOG_TO_FILE, LOG_FILE_*: logging config and file rotation
+- Validation for API key format and log retention
 """
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -8,19 +15,12 @@ from typing import Literal
 
 class Settings(BaseSettings):
     """
-    Application configuration settings
+    Application configuration loaded from environment variables (.env)
 
-    All settings can be configured via environment variables in .env file
-
-    Required settings:
-    - GEMINI_API_KEY: Gemini API key (required, no default)
-
-    Optional settings:
-    - GEMINI_MODEL: Model to use (default: "gemini-2.5-flash")
-    - LOG_LEVEL: Logging level (default: "INFO")
-    - LOG_TO_FILE: Enable file logging (default: False)
-    - LOG_FILE_PATH: Path to log file (default: "logs/app.log")
-    - LOG_FILE_RETENTION: Days to retain logs (default: 7)
+    Responsibilities:
+    - Load and validate GEMINI_* and LOG_* settings
+    - Validate GEMINI_API_KEY (non-empty, AIzaSy prefix, length)
+    - Expose APP_NAME, APP_VERSION and logging options
     """
     
     APP_NAME: str = Field(
@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     @field_validator('GEMINI_API_KEY')
     @classmethod
     def validate_api_key(cls, v: str) -> str:
-        """Validate API key not empty and has reasonable format"""
+        """Validate API key non-empty and reasonable format (AIzaSy prefix, length)"""
         v = v.strip()
 
         if not v:

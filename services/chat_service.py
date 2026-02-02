@@ -9,13 +9,20 @@ Key features:
 - Streaming response and history persistence
 - User-facing error messages on LLM/session failure
 """
-from typing import Generator, List
+from typing import Generator, List, Union
+from dataclasses import dataclass
 
 from utils import logger, LLMServiceError
 from ai import LLMClient
 from memory import ChatHistory
 from domain import ChatMessage
+from config import MessageKey
 from .session_manager import SessionManager
+
+@dataclass(frozen=True)
+class StreamError:
+    """Stream error result; Application resolves key to user message"""
+    key: MessageKey
 
 class ChatService:
     """
@@ -81,25 +88,15 @@ class ChatService:
 
         yield from self._stream_response(user_input)
 
-    def _handle_stream_error(self, error: Exception, error_type: str) -> str:
-        """
-        Handle streaming errors and return user-friendly error messages
-
-        Args:
-            error: The exception that occurred during streaming
-            error_type: Type of error for routing
-
-        Returns:
-            str: User-friendly error message formatted for display
-        """
-        if error_type == "llm_service":
+    def _stream_error_key(self, error: Exception) -> MessageKey:
+        """Map streaming exception to MessageKey error code"""
+        if isinstance(error, LLMServiceError):
             logger.error(f"AI Service error: {error}")
-            return "\n\n[Lỗi kết nối: Không thể tải toàn bộ tin nhắn, vui lòng thử lại]"
-        else:
-            logger.error(f"Unexpected Chat Error: {error}")
-            return "\n\n[Lỗi hệ thống: Đã xảy ra sự cố không mong muốn]"
+            return MessageKey.LLM_ERROR
+        logger.error(f"Unexpected Chat Error: {error}")
+        return MessageKey.UNEXPECTED_ERROR
 
-    def _stream_response(self, user_input: str) -> Generator[str, None, None]:
+    def _stream_response(self, user_input: str) -> Generator[Union[str, StreamError], None, None]:
         """
         Handle the LLM streaming lifecycle: load history, stream response, save result
 
@@ -137,15 +134,13 @@ class ChatService:
                 yield chunk
 
         except LLMServiceError as e:
-            error_message = self._handle_stream_error(e, "llm_service")
-            full_response += error_message
-            yield error_message
+            error_key = self._stream_error_key(e)
+            yield StreamError(key=error_key)
             error_occurred = True
 
         except Exception as e:
-            error_message = self._handle_stream_error(e, "unexpected")
-            full_response += error_message
-            yield error_message
+            error_key = self._stream_error_key(e)
+            yield StreamError(key=error_key)
             error_occurred = True
 
         finally:

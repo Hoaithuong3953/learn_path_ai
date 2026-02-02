@@ -42,3 +42,11 @@ class SessionManager:
     def reset(self) -> None:
         """Reset the session to its initial state"""
         self._last_activity = None
+
+    def get_last_activity(self):
+        """Return the last activity datetime (for session persistence) or None"""
+        return self._last_activity
+    
+    def set_last_activity(self, value: datetime | None) -> None:
+        """Restore the last activity (e.g. from session_state)"""
+        self._last_activity = value

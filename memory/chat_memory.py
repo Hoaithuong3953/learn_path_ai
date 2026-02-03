@@ -17,11 +17,11 @@ class ChatMemory:
 
     Responsibilities:
     - Store messages in an in-memory list
-    - Provide add_message, add_user_message, add_bot_message, load_history, clean_history
+    - Provide add_message, load_history, clean_history
     """
-    def __init__(self, storage: List[ChatMessage]):
-        """Initialize chat memory with the given storage list"""
-        self.storage = storage
+    def __init__(self):
+        """Initialize chat memory with an empty storage list"""
+        self._storage: List[ChatMessage] = []
 
     def load_history(self) -> List[ChatMessage]:
         """
@@ -30,7 +30,7 @@ class ChatMemory:
         Returns:
             List of ChatMessage in chronological order
         """
-        return self.storage
+        return list(self._storage)
 
     def add_message(self, message: ChatMessage) -> None:
         """
@@ -39,28 +39,8 @@ class ChatMemory:
         Args:
             message: ChatMessage to append
         """
-        self.storage.append(message)
-
-    def add_user_message(self, content: str) -> None:
-        """
-        Add a user message to the chat history
-
-        Args:
-            content: Raw text of the user message
-        """
-        msg = ChatMessage(role="user", content=content)
-        self.add_message(msg)
-
-    def add_bot_message(self, content: str) -> None:
-        """
-        Add a bot/assistant message to the chat history
-
-        Args:
-            content: Raw text of the assistant message
-        """
-        msg = ChatMessage(role="assistant", content=content)
-        self.add_message(msg)
+        self._storage.append(message)
 
     def clean_history(self) -> None:
         """Clear all messages from the chat history"""
-        self.storage.clear()
+        self._storage.clear()
